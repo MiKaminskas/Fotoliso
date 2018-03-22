@@ -19,6 +19,7 @@ public class Country {
 
 
     Country(JSONObject country) throws JSONException {
+        this.id = country.getString("id");
         this.name = country.getString("name");
         this.latitude = country.getDouble("latitude");
         this.longitude = country.getDouble("longitude");

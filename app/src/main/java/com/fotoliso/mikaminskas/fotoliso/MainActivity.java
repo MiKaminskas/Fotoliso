@@ -25,8 +25,8 @@ public class MainActivity extends FragmentActivity{
             switch (item.getItemId()) {
                 case R.id.navigation_home:
 
-                    fragment = SearchFragment.newInstance();
-
+                    /*fragment = SearchFragment.newInstance();*/
+                    fragment = new PerformerListFragment();
                     break;
                 case R.id.navigation_favorites:
                     fragment = MapFragment.newInstance();

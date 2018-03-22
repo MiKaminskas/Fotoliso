@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Fotoliso</string>
+    <string name="search">Search</string>
+    <string name="favorites">favorites</string>
+</resources>

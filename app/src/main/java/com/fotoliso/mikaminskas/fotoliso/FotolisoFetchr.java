@@ -68,7 +68,6 @@ public class FotolisoFetchr {
         }
         return null;
     }
-
     //some magic here
     private String md5(String encTarget){
         MessageDigest mdEnc = null;
@@ -100,21 +99,95 @@ public class FotolisoFetchr {
         }
         return countryList;
     }
-    public List<Perfmormer> fetchPerformers(){
-        List<Perfmormer> perormersList = new ArrayList<>();
-        String base = "performers ";
+
+
+    public List<Performer> fetchPerformers(String countryID) throws IOException, JSONException {
+        String base = "performers";
         String url = Uri.parse("http://appsrvr.fotoliso.com/")
                 .buildUpon()
-                .appendQueryParameter("get",base)
+                .appendQueryParameter("get", base)
                 .appendQueryParameter("sum",md5("1.00" + "AhHooNgoh5ie"+ base.toLowerCase()  + "irei8ooPaero"))
+                .appendQueryParameter("country", countryID)
                 .build().toString();
+        String jsonString = getUrlString(url);
+        Log.d(TAG,jsonString);
 
-        return perormersList;
+        return parsePerformers(jsonString);
     }
-    public List<Perfmormer> parsePerformer(String jsonString) throws JSONException {
-        List<Perfmormer> performerList = new ArrayList<>();
+
+    public List<Performer> parsePerformers(String jsonString) throws JSONException {
+        List<Performer> performerList = new ArrayList<>();
+
         JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject data = jsonObject.getJSONObject("data");
+        int usersCount = Integer.parseInt(data.getString("usersCount"));
+        JSONArray users = data.getJSONArray("users");
+        for (int i = 0; i<usersCount; i++){
+            JSONObject currUser = users.getJSONObject(i);
+            Performer newUser = new Performer();/* = parsePerformer(currUser);*/
+
+            newUser.setId(currUser.getString("id"));
+            newUser.setLogin(currUser.getString("login"));
+            newUser.setFio(currUser.getString("fio"));
+            newUser.setContacts(currUser.getString("contacts"));
+            newUser.setAvatar(currUser.getString("avatar"));
+            newUser.setRegistered(currUser.getInt("registered"));
+            newUser.setName(currUser.getString("name"));
+            newUser.setSurname(currUser.getString("surname"));
+            newUser.setCity(currUser.getString("city"));
+            newUser.setAva_thumb(currUser.getString("ava_thumb"));
+            newUser.setRating(currUser.getDouble("rating"));
+            newUser.setReviews(currUser.getInt("reviews"));
+
+            performerList.add(newUser);
+        }
+
 
         return  performerList;
+    }
+
+    public Performer fetchPerformer(String performerID) throws IOException, JSONException {
+        String base = "performer";
+        String url = Uri.parse("http://appsrvr.fotoliso.com/")
+                .buildUpon()
+                .appendQueryParameter("get", base)
+                .appendQueryParameter("sum", md5("1.00" + "AhHooNgoh5ie" + base.toLowerCase() + "irei8ooPaero"))
+                .appendQueryParameter("id", performerID)
+                .build().toString();
+        String jsonString = getUrlString(url);
+
+        Log.d(TAG, jsonString);
+
+        return parsePerformer(jsonString);
+    }
+
+    private Performer parsePerformer(String jsonString) throws JSONException {
+        Performer user = new Performer();
+        JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject data = jsonObject.getJSONObject("data");
+        JSONObject performer = data.getJSONObject("performer");
+        user.setId(performer.getString("id"));
+        user.setLogin(performer.getString("login"));
+        user.setFio(performer.getString("fio"));
+        user.setContacts(performer.getString("contacts"));
+        user.setRegistered(performer.getInt("registered"));
+        user.setName(performer.getString("name"));
+        user.setSurname(performer.getString("surname"));
+        user.setStringid(performer.getString("stringid"));
+        user.setCity(performer.getString("city"));
+        user.setAva_thumb(performer.getString("ava_thumb"));
+        user.setRating(performer.getDouble("rating"));
+        user.setReviews(performer.getInt("reviews"));
+        user.setVk_url(performer.getString("vk_url"));
+        user.setFb_url(performer.getString("fb_url"));
+        user.setGp_url(performer.getString("gp_url"));
+        user.setYt_url(performer.getString("yt_url"));
+        user.setV1_url(performer.getString("v1_url"));
+        user.setV2_url(performer.getString("v2_url"));
+        user.setV3_url(performer.getString("v3_url"));
+        user.setLanguages(performer.getString("languages"));
+        user.setAbout(performer.getString("about"));
+
+        return user;
     }
 }

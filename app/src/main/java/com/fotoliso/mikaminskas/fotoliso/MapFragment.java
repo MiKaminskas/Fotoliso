@@ -1,6 +1,7 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -8,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,6 +43,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private MapView mapView;
     private List<Country> mCountryList;
+    private HashMap<String, String> mCountriesIdHashMap;
     //last know location
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -64,11 +71,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onResume();
         mapView.getMapAsync(this);
 
-        /*new FetchTest(mMap).execute();*/
+        /*new FetchCountries(mMap).execute();*/
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        //mover camera to last known location
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -79,7 +94,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        //mover camera to last known location
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
@@ -88,9 +102,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         if (location != null) {
                             // Logic to handle location object
 
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 4.5f ));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 4.5f));
 
-                            Log.d("map_fragment", location.getAltitude() + " " +  location.getLongitude());
+                            Log.d("map_fragment", location.getAltitude() + " " + location.getLongitude());
                         }
                     }
                 });
@@ -106,18 +120,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 /*
         LatLng currLock = new LatLng(longitude,latitude);*/
         /*mMap.addMarker(new MarkerOptions().position(new LatLng(30, 30)).title("Marker in Sydney"));*/
-        new FetchTest(mMap).execute();
+        new FetchCountries(mMap).execute();
 
     }
 
-    private class FetchTest extends AsyncTask<Void,Void,List<Country>> {
+    private class FetchCountries extends AsyncTask<Void,Void,List<Country>> {
         private GoogleMap mMap;
-        public FetchTest(GoogleMap mMap) {
+        public FetchCountries(GoogleMap mMap) {
             this.mMap = mMap;
         }
 
         @Override
         protected List<Country> doInBackground(Void... voids) {
+            Log.d(TAG," FetchCountries in WORK");
             return new FotolisoFetchr().fetchCountries();
         }
 
@@ -125,15 +140,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         protected void onPostExecute(List<Country> countries) {
             super.onPostExecute(countries);
             mCountryList = countries;
+            mCountriesIdHashMap = new HashMap<String,String>(mCountryList.size());
             for (int i =0; i< mCountryList.size();i++){
-                Country curr = mCountryList.get(i);
+                final Country curr = mCountryList.get(i);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(curr.getLatitude(),curr.getLongitude())).title(curr.getName()));
                 marker.setSnippet("Исполнителей: "+ curr.getPerformersCount());
+                mCountriesIdHashMap.put(curr.getName(),curr.getId());
+
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
                     @Override
                     public void onInfoWindowClick(Marker marker) {
                         Toast.makeText(getActivity(),"Hello",Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "marker in work " + marker.getTitle());
+
+                        Log.d(TAG, "marker in work " + marker.getTitle()+ "  "+ mCountriesIdHashMap.get(marker.getTitle()));
+                        new FetchPerformers(mCountriesIdHashMap.get(marker.getTitle())).execute();
+                        new FetchPerformer("42638").execute();
+                        /*new FetchCountries(mMap).execute();*/
+                        Fragment fragment = new  PerformerListFragment();
+                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.frame_layout,fragment);
+                        transaction.commit();
                     }
                 });
             }
@@ -141,4 +167,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         }
     }
+
+    private class FetchPerformers extends AsyncTask<Void,Void,List<Performer>>{
+        private String  mCountryID;
+        FetchPerformers(String countryID){
+            this.mCountryID = countryID;
+        }
+
+        @Override
+        protected List<Performer> doInBackground(Void... voids) {
+            Log.d(TAG," FetchPerformerS in WORK");
+            try {
+                return new FotolisoFetchr().fetchPerformers(mCountryID);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Performer> performers) {
+            super.onPostExecute(performers);
+
+        }
+    }
+
+    private class FetchPerformer extends AsyncTask<Void,Void,Performer>{
+        private String mPerformerID;
+        FetchPerformer(String performerID){
+            this.mPerformerID = performerID;
+        }
+
+        @Override
+        protected Performer doInBackground(Void... voids) {
+            Log.d(TAG," FetchPerformer in WORK");
+            try {
+                return new FotolisoFetchr().fetchPerformer(mPerformerID);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Performer performersList) {
+            super.onPostExecute(performersList);
+
+        }
+    }
+
 }
