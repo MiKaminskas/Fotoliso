@@ -1,5 +1,6 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +20,16 @@ import java.util.List;
 public class PerformerListFragment extends Fragment {
     private RecyclerView mPerformersView;
     private PerformerAdapter mAdapter;
+    private static List<Performer> mPerformers;
+
+
+    public static PerformerListFragment newInstance(List<Performer> performers){
+        mPerformers = performers;
+        PerformerListFragment fragment = new PerformerListFragment();
+        return fragment;
+    }
+
+
 
     @Nullable
     @Override
@@ -31,44 +41,47 @@ public class PerformerListFragment extends Fragment {
 
         updateUI();
 
-
         return view;
     }
     private void updateUI(){
-        List<Performer> performers = new ArrayList<>();
-        for (int i =0; i<100; i++){
+        /*List<Performer> performers = new ArrayList<>();*/
+        /*for (int i =0; i<100; i++){
             Performer performer = new Performer();
             performer.setName(Integer.toString(i));
             performers.add(performer);
-        }
-        mAdapter = new PerformerAdapter(performers);
+        }*/
+        mAdapter = new PerformerAdapter(mPerformers);
         mPerformersView.setAdapter(mAdapter);
     }
 
     private class PerformerHolder extends RecyclerView.ViewHolder{
-        public TextView mTitleTextView;
+        public TextView mNameTextView;
+        public TextView mReviewCountTextView;
 
         public PerformerHolder(View itemView) {
             super(itemView);
-            mTitleTextView = (TextView)itemView;
+            mNameTextView = (TextView)itemView.findViewById(R.id.performer_name_textview);
+            mReviewCountTextView = (TextView) itemView.findViewById(R.id.performer_review_counter_textview);
         }
     }
     private class PerformerAdapter extends RecyclerView.Adapter<PerformerHolder>{
         private List<Performer> mPerformers;
         public PerformerAdapter(List<Performer> performers){
             this.mPerformers = performers;
+
         }
         @Override
         public PerformerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(android.R.layout.simple_expandable_list_item_1,parent,false);
+            View view = layoutInflater.inflate(R.layout.performer_card_experement,parent,false);
             return new PerformerHolder(view);
         }
 
         @Override
         public void onBindViewHolder(PerformerHolder holder, int position) {
             Performer performer = mPerformers.get(position);
-            holder.mTitleTextView.setText(performer.getName());
+            holder.mNameTextView.setText(performer.getName());
+            holder.mReviewCountTextView.setText(getString(R.string.review)+ " " + performer.getReviews());
 
         }
 

@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-public class MainActivity extends FragmentActivity{
+public class MainActivity extends FragmentActivity {
     private final String TAG = "MainActivity";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -21,15 +21,16 @@ public class MainActivity extends FragmentActivity{
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment = null;
+            Fragment fragment = MapFragment.newInstance();
             switch (item.getItemId()) {
+                case R.id.recent_viewed:
+                    fragment = SearchFragment.newInstance();
+                    break;
                 case R.id.navigation_home:
-
                     /*fragment = SearchFragment.newInstance();*/
-                    fragment = new PerformerListFragment();
                     break;
                 case R.id.navigation_favorites:
-                    fragment = MapFragment.newInstance();
+                    //fragment = MapFragment.newInstance();
                     break;
             }
 

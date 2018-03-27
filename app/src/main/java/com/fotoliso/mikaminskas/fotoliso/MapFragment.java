@@ -1,9 +1,8 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
-
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +30,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -141,6 +141,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             super.onPostExecute(countries);
             mCountryList = countries;
             mCountriesIdHashMap = new HashMap<String,String>(mCountryList.size());
+
             for (int i =0; i< mCountryList.size();i++){
                 final Country curr = mCountryList.get(i);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(curr.getLatitude(),curr.getLongitude())).title(curr.getName()));
@@ -154,12 +155,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                         Log.d(TAG, "marker in work " + marker.getTitle()+ "  "+ mCountriesIdHashMap.get(marker.getTitle()));
                         new FetchPerformers(mCountriesIdHashMap.get(marker.getTitle())).execute();
-                        new FetchPerformer("42638").execute();
+                        /*new FetchPerformer("42638").execute();*/
                         /*new FetchCountries(mMap).execute();*/
-                        Fragment fragment = new  PerformerListFragment();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.frame_layout,fragment);
-                        transaction.commit();
                     }
                 });
             }
@@ -190,6 +187,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(List<Performer> performers) {
             super.onPostExecute(performers);
+            Fragment fragment = PerformerListFragment.newInstance(performers);
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_layout,fragment);
+            transaction.commit();
 
         }
     }

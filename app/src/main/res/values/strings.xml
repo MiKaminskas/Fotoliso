@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Fotoliso</string>
     <string name="search">Search</string>
-    <string name="favorites">favorites</string>
+    <string name="favorites">Favorites</string>
+    <string name="recentviewed">Recents</string>
+    <string name="review">Review:</string>
 </resources>
