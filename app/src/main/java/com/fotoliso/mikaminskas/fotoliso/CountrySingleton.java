@@ -12,17 +12,17 @@ public class CountrySingleton {
     private static CountrySingleton sCountrySingleton;
     private static List<Country> countryList;
 
-    public static CountrySingleton get(Context context, List<Country> countryList) {
+    public static CountrySingleton get(/*Context context,*/ List<Country> countryList) {
         if (sCountrySingleton == null) {
-            sCountrySingleton = new CountrySingleton(context, countryList);
+            sCountrySingleton = new CountrySingleton(/*context,*/ countryList);
         }
         return sCountrySingleton;
     }
     public static List<Country> getCountryList(){
         return countryList;
     }
-
-    private CountrySingleton(Context context, List<Country> countryList) {
+    // TODO context?!
+    private CountrySingleton(/*Context context, */List<Country> countryList) {
         this.countryList = countryList;
     }
 }
