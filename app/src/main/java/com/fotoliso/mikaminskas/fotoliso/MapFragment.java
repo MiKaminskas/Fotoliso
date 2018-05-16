@@ -5,12 +5,14 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,7 +33,9 @@ import java.util.List;
  * Created by misha on 3/10/2018.
  */
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnCameraMoveListener {
     private final String TAG = "MapFragment";
     private GoogleMap mMap;
     private MapView mapView;
@@ -47,6 +51,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_field_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.app_bar_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, " Text change");
+                return false;
+            }
+        });
     }
 
     @Override
@@ -62,7 +87,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         mapView.getMapAsync(this);
-
     }
 
     @Override
@@ -77,9 +101,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCameraPositonCoordinates, 4.5f));
         mMap.getUiSettings().setMapToolbarEnabled(false);
-
         addMarkers();
 
+        mMap.setOnCameraMoveListener(this);
+
+
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Log.d(TAG, "marker in work " + marker.getTitle() + "  " + mCountriesIdHashMap.get(marker.getTitle()));
+        new FetchPerformers(mCountriesIdHashMap.get(marker.getTitle())).execute();
+
+    }
+
+    //TODO opt marker drawing throw this method
+    @Override
+    public void onCameraMove() {
+        Log.d(TAG, "Camera moved");
 
     }
 
@@ -95,7 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, " FetchPerformerS in WORK");
             try {
                 return new FotolisoFetchr().fetchPerformers(mCountryID);
-            }catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -106,7 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(List<Performer> performers) {
             super.onPostExecute(performers);
-            ((MainActivity) getActivity()).showFragment(PerformerListFragment.newInstance(performers), "PERFORMERS");
+            ((MainActivity) getActivity()).showFragment(PostSearchList.newInstance(performers), "PERFORMERS");
         }
     }
 
@@ -140,24 +179,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void addMarkers() {
         List<Country> mCountryList = CountrySingleton.getCountryList();
-        mCountriesIdHashMap = new HashMap<String, String>(mCountryList.size());
+        mCountriesIdHashMap = new HashMap<>(mCountryList.size());
 
         for (int i = 0; i < mCountryList.size(); i++) {
-            final Country curr = mCountryList.get(i);
-            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(curr.getLatitude(), curr.getLongitude())).title(curr.getName()));
-            marker.setSnippet("Исполнителей: " + curr.getPerformersCount());
+            Country curr = mCountryList.get(i);
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(curr.getLatitude(), curr.getLongitude()))
+                    .title(curr.getName())
+                    .snippet("Исполнителей: " + curr.getPerformersCount())
+            );
             mCountriesIdHashMap.put(curr.getName(), curr.getId());
-
-            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                @Override
-                public void onInfoWindowClick(Marker marker) {
-                    Log.d(TAG, "marker in work " + marker.getTitle() + "  " + mCountriesIdHashMap.get(marker.getTitle()));
-                    new FetchPerformers(mCountriesIdHashMap.get(marker.getTitle())).execute();
-                    /*new FetchPerformer("42638").execute();*/
-                }
-            });
         }
-
+        mMap.setOnInfoWindowClickListener(this);
     }
 
 }

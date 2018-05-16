@@ -131,13 +131,13 @@ public class FotolisoFetchr {
             newUser.setFio(currUser.getString("fio"));
             newUser.setContacts(currUser.getString("contacts"));
             newUser.setAvatar(currUser.getString("avatar"));
-            newUser.setRegistered(currUser.getInt("registered"));
+            newUser.setRegistered(currUser.getString("registered"));
             newUser.setName(currUser.getString("name"));
             newUser.setSurname(currUser.getString("surname"));
             newUser.setCity(currUser.getString("city"));
             newUser.setAva_thumb(currUser.getString("ava_thumb"));
-            newUser.setRating(currUser.getDouble("rating"));
-            newUser.setReviews(currUser.getInt("reviews"));
+            newUser.setRating(currUser.getString("rating"));
+            newUser.setReviews(currUser.getString("reviews"));
 
             performerList.add(newUser);
         }
@@ -163,6 +163,7 @@ public class FotolisoFetchr {
 
     private Performer parsePerformer(String jsonString) throws JSONException {
         Performer user = new Performer();
+        Log.d(TAG,"parsePerformer, String = " + jsonString);
         JSONObject jsonObject = new JSONObject(jsonString);
         JSONObject data = jsonObject.getJSONObject("data");
         JSONObject performer = data.getJSONObject("performer");
@@ -170,14 +171,14 @@ public class FotolisoFetchr {
         user.setLogin(performer.getString("login"));
         user.setFio(performer.getString("fio"));
         user.setContacts(performer.getString("contacts"));
-        user.setRegistered(performer.getInt("registered"));
+        user.setRegistered(performer.getString("registered"));
         user.setName(performer.getString("name"));
         user.setSurname(performer.getString("surname"));
         user.setStringid(performer.getString("stringid"));
         user.setCity(performer.getString("city"));
         user.setAva_thumb(performer.getString("ava_thumb"));
-        user.setRating(performer.getDouble("rating"));
-        user.setReviews(performer.getInt("reviews"));
+        user.setRating(performer.getString("rating"));
+        user.setReviews(performer.getString("reviews"));
         user.setVk_url(performer.getString("vk_url"));
         user.setFb_url(performer.getString("fb_url"));
         user.setGp_url(performer.getString("gp_url"));

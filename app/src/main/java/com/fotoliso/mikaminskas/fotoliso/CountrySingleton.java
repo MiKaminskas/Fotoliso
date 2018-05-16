@@ -21,7 +21,7 @@ public class CountrySingleton {
     public static List<Country> getCountryList(){
         return countryList;
     }
-    // TODO context?!
+
     private CountrySingleton(/*Context context, */List<Country> countryList) {
         this.countryList = countryList;
     }

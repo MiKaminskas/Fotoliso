@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.recent_viewed:
+                    //TODO create recente reciclerview + db clase
                     fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("SEARCH");
                     if (fragment == null || !fragment.isVisible()) {
                         showFragment(SearchFragment.newInstance(), "SEARCH");
@@ -50,9 +51,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.navigation_favorites:
+                    //TODO create favorites reciclerview + db clase
+                    /*Intent intent = new Intent(MainActivity.this, PerformerActivity.class);
+                    startActivity(intent);*/
                     fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FAVORITES");
                     if (fragment == null || !fragment.isVisible()) {
-
+                        Log.d(TAG," Favorites work!");
                     }
                     break;
             }
@@ -71,11 +75,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //mover camera to last known location
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
+            // TODO: Consider calling permission access
 
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             cameraPositionCoordinates = new LatLng(54, 25);
-            Log.d("map_fragment", " no permisson to last location");
+            Log.d(TAG, " no permisson to last location");
         } else {
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -96,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                                 cameraPositionCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
 
 
-                                Log.d("map_fragment", location.getAltitude() + " " + location.getLongitude());
+                                Log.d(TAG, location.getAltitude() + " " + location.getLongitude());
                             }
                         }
                     });
@@ -122,10 +127,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class FetchCountries extends AsyncTask<Void, Void, List<Country>> {
-
-        FetchCountries() {
-        }
-
         @Override
         protected List<Country> doInBackground(Void... voids) {
             Log.d(TAG, " FetchCountries in WORK");

@@ -1,25 +1,39 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
-import java.util.List;
+import android.util.Log;
 
 /**
  * Created by misha on 3/18/2018.
  */
 
 public class Performer {
+    private final String TAG = "Performer";
+
     private String id;
     private String login;
-    private String fio;
     private String contacts;
     private String avatar;
-    private int registered;
+    private String registered;
     private String name;
     private String surname;
     private String stringid;
-    private String city;
+
     private String ava_thumb;
-    private double rating;
-    private int reviews;
+    private String rating;
+    private String reviews;
+
+    private String fio;
+    private String city;
+    private String vk_url;
+    private String fb_url;
+    private String gp_url;
+    private String yt_url;
+    private String v1_url;
+    private String v2_url;
+    private String v3_url;
+    private String languages;
+    private String about;
+
 
     public String getId() {
         return id;
@@ -61,11 +75,11 @@ public class Performer {
         this.avatar = avatar;
     }
 
-    public int getRegistered() {
+    public String getRegistered() {
         return registered;
     }
 
-    public void setRegistered(int registered) {
+    public void setRegistered(String registered) {
         this.registered = registered;
     }
 
@@ -109,19 +123,19 @@ public class Performer {
         this.ava_thumb = ava_thumb;
     }
 
-    public double getRating() {
+    public String getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(String rating) {
         this.rating = rating;
     }
 
-    public int getReviews() {
+    public String getReviews() {
         return reviews;
     }
 
-    public void setReviews(int reviews) {
+    public void setReviews(String reviews) {
         this.reviews = reviews;
     }
 
@@ -197,17 +211,31 @@ public class Performer {
         this.about = about;
     }
 
-    private String vk_url;
-    private String fb_url;
-    private String gp_url;
-    private String yt_url;
-    private String v1_url;
-    private String v2_url;
-    private String v3_url;
-    private String languages;
-    private String about;
+    public void printObjectInLog() {
+        Log.d(TAG, "id: " + id);
+        Log.d(TAG, "login:" + login);
+        Log.d(TAG, "contacts: " + contacts);
+        Log.d(TAG, "registered: " + registered);
+        Log.d(TAG, "name: " + name);
+        Log.d(TAG, "surname: " + surname);
+        Log.d(TAG, "stringid: " + stringid);
+        Log.d(TAG, "rating: " + rating);
+        Log.d(TAG, "reviews: " + reviews);
+        Log.d(TAG, "fio: " + fio);
+        Log.d(TAG, "city: " + city);
+        Log.d(TAG, "vk_url: " + vk_url);
+        Log.d(TAG, "fb_url: " +fb_url);
+        Log.d(TAG, "gp_url: " +gp_url);
+        Log.d(TAG, "yt_url: " +yt_url);
+        Log.d(TAG, "v1_url: " +v1_url);
+        Log.d(TAG, "v2_url: " +v2_url);
+        Log.d(TAG, "v3_url: " +v3_url);
+        Log.d(TAG, "languages_url: " +languages);
+        Log.d(TAG, "about: " +about);
+    }
+
     //public List<Foto> fotos;
-    Performer(){
+    Performer() {
 
     }
 }
