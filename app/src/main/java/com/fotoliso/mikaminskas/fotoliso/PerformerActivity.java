@@ -1,5 +1,6 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.fotoliso.mikaminskas.fotoliso.database.PerformerLabManipulator;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -21,6 +24,7 @@ public class PerformerActivity extends AppCompatActivity {
     private final String TAG = "PerformerActivity";
     private ProgressBar progressBar;
     private LinearLayout linearLayout;
+    private Performer activePerformer;
 
     // TODO set Image
     @Override
@@ -30,11 +34,16 @@ public class PerformerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final Context context = this;
+        //TODO make button active/unactive and delete/add to fav on press
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Added to favorites", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                PerformerLabManipulator lab = PerformerLabManipulator.get(context);
+                lab.addFavorites(activePerformer);
+                Log.d(TAG," performers : " +  lab.getPerformers().size());
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -70,7 +79,7 @@ public class PerformerActivity extends AppCompatActivity {
 
             linearLayout.setVisibility(View.VISIBLE);
 
-
+            activePerformer = performer;
             performer.printObjectInLog();
             renderPerformerFields(performer);
 
@@ -89,7 +98,7 @@ public class PerformerActivity extends AppCompatActivity {
             ((TextView)findViewById(R.id.performer_city)).setText(performer.getCity());
         }
 
-        /*if (!performer.getSpecialyty().equals("")){
+        /*if (!performer.getSpeciality().equals("")){
             ((CardView)findViewById(R.id.speciality_container)).setVisibility(View.VISIBLE);
             ((TextView)findViewById(R.id.performer_speciality)).setText(performer.getSpeciality());
         }*/

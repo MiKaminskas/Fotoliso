@@ -1,5 +1,6 @@
 package com.fotoliso.mikaminskas.fotoliso;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -13,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.fotoliso.mikaminskas.fotoliso.database.FavoritesDbHelper;
+import com.fotoliso.mikaminskas.fotoliso.database.FavoritesDbSchema;
+import com.fotoliso.mikaminskas.fotoliso.database.PerformerLabManipulator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -27,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private Context context;
 
     //last know location
     private FusedLocationProviderClient mFusedLocationClient;
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.recent_viewed:
-                    //TODO create recente reciclerview + db clase
+                    //TODO create recent reciclerview + db clase
                     fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("SEARCH");
                     if (fragment == null || !fragment.isVisible()) {
                         showFragment(SearchFragment.newInstance(), "SEARCH");
@@ -51,12 +56,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.navigation_favorites:
-                    //TODO create favorites reciclerview + db clase
+
                     /*Intent intent = new Intent(MainActivity.this, PerformerActivity.class);
                     startActivity(intent);*/
                     fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FAVORITES");
                     if (fragment == null || !fragment.isVisible()) {
                         Log.d(TAG," Favorites work!");
+                        showFragment(FavoritesFragment.newInstance(context),"FAVORITES");
                     }
                     break;
             }
@@ -74,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = this;
+        PerformerLabManipulator lab = PerformerLabManipulator.get(this);
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -114,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+    //TODO make navigation on back press
     @Override
     public void onBackPressed() {
         super.onBackPressed();

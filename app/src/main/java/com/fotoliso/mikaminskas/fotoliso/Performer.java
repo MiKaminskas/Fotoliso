@@ -235,7 +235,7 @@ public class Performer {
     }
 
     //public List<Foto> fotos;
-    Performer() {
+    public Performer() {
 
     }
 }
